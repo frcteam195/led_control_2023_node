@@ -14,6 +14,7 @@ def ros_func():
 
     rate = rospy.Rate(20)
 
+    rospy.loginfo("LED")
     while not rospy.is_shutdown():
 
         if control_sub.get() is not None:

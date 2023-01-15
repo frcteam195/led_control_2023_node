@@ -18,7 +18,13 @@ def ros_func():
     while not rospy.is_shutdown():
 
         if control_sub.get() is not None:
-            pass
+
+            if control_sub.get().control_mode == control_sub.get().SET_LED:
+                #Set_LED Code
+                pass
+            else:
+                #Animate Code
+                pass
 
         
 

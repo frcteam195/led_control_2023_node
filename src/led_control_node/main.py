@@ -10,7 +10,7 @@ from ck_utilities_py_node.led import LEDColor, LEDControlMode, LEDStrip, LEDStri
 
 def ros_func():
     control_subscriber = BufferedROSMsgHandlerPy(Led_Control)
-    control_subscriber.register_for_updates("LedControl")
+    control_subscriber.register_for_updates("LEDChanger")
 
     test_timer = 0
 
@@ -25,20 +25,19 @@ def ros_func():
     while not rospy.is_shutdown():
 
         if control_subscriber.get() is not None:
-
             if control_subscriber.get().control_mode == Led_Control.SET_LED:
-                #Set_LED Code
-                pass
+                test_strip.setLEDControlMode(LEDControlMode.Static)
+                test_strip.setLEDColor(LEDColor(RGBWColor(control_subscriber.get().red, control_subscriber.get().green, control_subscriber.get().blue, control_subscriber.get().white), 0, 8))
             else:
                 #Animate Code
                 pass
 
         # Set LEDs as a Test Every 5 Seconds or so...
         if test_timer > 100:
-            test_strip.setLEDControlMode(LEDControlMode.Static)
-            test_strip.setLEDColor(red)
+            #test_strip.setLEDControlMode(LEDControlMode.Static)
+           #test_strip.setLEDColor(green)
             test_timer = 0
-
+            
         test_timer += 1
 
         rate.sleep()

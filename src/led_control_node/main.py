@@ -22,19 +22,21 @@ def ros_func():
     green = LEDColor(RGBWColor(G=255), 0, 8)
     blue = LEDColor(RGBWColor(B=255), 0, 8)
 
+    test_strip.setLEDControlMode(LEDControlMode.Animated)
+    test_strip.setLEDAnimations([LEDAnimation(0, 1, 1, 8, RGBWColor(200, 50, 255, 100), AnimationType.Rainbow, Direction.Forward, 0, 0)])
+
+
+
     while not rospy.is_shutdown():
 
-        if control_subscriber.get() is not None:
-            if control_subscriber.get().control_mode == Led_Control.SET_LED:
-                test_strip.setLEDControlMode(LEDControlMode.Static)
-                test_strip.setLEDColor(LEDColor(RGBWColor(control_subscriber.get().red, control_subscriber.get().green, control_subscriber.get().blue, control_subscriber.get().white), 0, control_subscriber.get().number_leds))
+        # if control_subscriber.get() is not None:
+        #     if control_subscriber.get().control_mode == Led_Control.SET_LED:
+        #         test_strip.setLEDControlMode(LEDControlMode.Static)
+        #         test_strip.setLEDColor(LEDColor(RGBWColor(control_subscriber.get().red, control_subscriber.get().green, control_subscriber.get().blue, control_subscriber.get().white), 0, control_subscriber.get().number_leds))
                 
-            else:
-                #Animate Code
-                test_strip.setLEDControlMode(LEDControlMode.Animated)
-                test_strip.setLEDAnimation(LEDAnimation(0, 1, 1, 8, RGBWColor(200, 50, 255, 100), AnimationType.Rainbow, Direction.Forward, 0, 0))
-
-        
+        #     else:
+        #         #Animate Code
+        pass
             
 
         # Set LEDs as a Test Every 5 Seconds or so...
@@ -44,7 +46,7 @@ def ros_func():
             #test_strip.setLEDColor(green)
             #test_timer = 0
             
-        test_timer -= 1
+        #test_timer -= 1
 
         rate.sleep()
 

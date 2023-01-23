@@ -8,6 +8,7 @@ from frc_robot_utilities_py_node.RobotStatusHelperPy import BufferedROSMsgHandle
 from ck_ros_msgs_node.msg import Led_Control
 from ck_utilities_py_node.led import LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor, LEDAnimation, AnimationType, Direction
 
+
 def ros_func():
     control_subscriber = BufferedROSMsgHandlerPy(Led_Control)
     control_subscriber.register_for_updates("LedControl")
@@ -31,15 +32,14 @@ def ros_func():
     while not rospy.is_shutdown():
 
         if control_subscriber.get() is not None:
+            control_msg: Led_Control = control_subscriber.get()
+            color = RGBWColor(control_msg.red, control_msg.green, control_msg.blue, control_msg.white)
 
-            color = RGBWColor(control_subscriber.get().red, control_subscriber.get().green, control_subscriber.get().blue, control_subscriber.get().white)
-
-            if control_subscriber.get().control_mode == Led_Control.SET_LED:
+            if control_msg.control_mode == Led_Control.SET_LED:
                 leds.setLEDControlMode(LEDControlMode.Static)
-                leds.setLEDColor(LEDColor(color, 0, control_subscriber.get().number_leds))
+                leds.setLEDColor(LEDColor(color, 0, control_msg.number_leds))
             else:
-                animation = LEDAnimation(0, control_subscriber.get().brightness, control_subscriber.get().speed,
-                                         control_subscriber.get().number_leds, color, animation_map[control_subscriber.get().animation])
+                animation = LEDAnimation(0, control_msg.brightness, control_msg.speed, control_msg.number_leds, color, animation_map[control_msg.animation])
 
                 leds.setLEDControlMode(LEDControlMode.Animated)
                 leds.setLEDAnimations([animation])

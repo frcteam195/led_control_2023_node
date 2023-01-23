@@ -8,10 +8,21 @@ from frc_robot_utilities_py_node.RobotStatusHelperPy import BufferedROSMsgHandle
 from ck_ros_msgs_node.msg import Led_Control
 from ck_utilities_py_node.led import LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor, LEDAnimation, AnimationType, Direction
 
-
 def ros_func():
     control_subscriber = BufferedROSMsgHandlerPy(Led_Control)
     control_subscriber.register_for_updates("LedControl")
+
+    animation_map = {
+        Led_Control.COLOR_FLOW: AnimationType.ColorFlow,
+        Led_Control.FIRE: AnimationType.Fire,
+        Led_Control.LARSON: AnimationType.Larson,
+        Led_Control.RAINBOW: AnimationType.Rainbow,
+        Led_Control.RGB_FADE: AnimationType.RGBFade,
+        Led_Control.SINGLE_FADE: AnimationType.SingleFade,
+        Led_Control.TWINKLE: AnimationType.Twinkle,
+        Led_Control.TWINKLE_OFF: AnimationType.TwinkleOff,
+        Led_Control.STROBE: AnimationType.Strobe
+    }
 
     rate = rospy.Rate(20)
 
@@ -28,7 +39,7 @@ def ros_func():
                 leds.setLEDColor(LEDColor(color, 0, control_subscriber.get().number_leds))
             else:
                 animation = LEDAnimation(0, control_subscriber.get().brightness, control_subscriber.get().speed,
-                                         control_subscriber.get().number_leds, color, control_subscriber.get().animation)
+                                         control_subscriber.get().number_leds, color, animation_map[control_subscriber.get().animation])
 
                 leds.setLEDControlMode(LEDControlMode.Animated)
                 leds.setLEDAnimations([animation])

@@ -20,15 +20,17 @@ def ros_func():
     while not rospy.is_shutdown():
 
         if control_subscriber.get() is not None:
+            control_msg : Led_Control = control_subscriber.get()
+            color = RGBWColor(control_msg.red, control_msg.green, control_msg.blue, control_msg.white)
 
-            color = RGBWColor(control_subscriber.get().red, control_subscriber.get().green, control_subscriber.get().blue, control_subscriber.get().white)
 
-            if control_subscriber.get().control_mode == Led_Control.SET_LED:
+
+            if control_msg.control_mode == Led_Control.SET_LED:
                 leds.setLEDControlMode(LEDControlMode.Static)
-                leds.setLEDColor(LEDColor(color, 0, control_subscriber.get().number_leds))
+                leds.setLEDColor(LEDColor(color, 0, control_msg.number_leds))
             else:
-                animation = LEDAnimation(0, control_subscriber.get().brightness, control_subscriber.get().speed,
-                                         control_subscriber.get().number_leds, color, control_subscriber.get().animation)
+                animation = LEDAnimation(0, control_msg.brightness, control_msg.speed,
+                                         control_msg.number_leds, color, control_msg.animation)
 
                 leds.setLEDControlMode(LEDControlMode.Animated)
                 leds.setLEDAnimations([animation])

@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
-# Import required Python code.
 import roslib
+import rospy
+
+from led_control_node.main import LedControlNode
+
 NODE_NAME = 'led_control_node'
 roslib.load_manifest(NODE_NAME)
-import rospy
-import tf2_ros
-import led_control_node.main as main
+
 if __name__ == '__main__':
-    main.ros_main(NODE_NAME)
+    rospy.init_node(NODE_NAME)
+    try:
+        node = LedControlNode()
+    except rospy.ROSInterruptException:
+        pass

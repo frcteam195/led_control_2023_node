@@ -1,59 +1,69 @@
-#!/usr/bin/env python3
-
 import rospy
 from threading import Thread
 
-from frc_robot_utilities_py_node.frc_robot_utilities_py import *
-from frc_robot_utilities_py_node.RobotStatusHelperPy import BufferedROSMsgHandlerPy
+from frc_robot_utilities_py_node.BufferedROSMsgHandlerPy import BufferedROSMsgHandlerPy
 from ck_ros_msgs_node.msg import Led_Control
-from ck_utilities_py_node.led import LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor, LEDAnimation, AnimationType, Direction
+from ck_utilities_py_node.led import AnimationType, LEDAnimation, LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor
 
 
-def ros_func():
-    control_subscriber = BufferedROSMsgHandlerPy(Led_Control)
-    control_subscriber.register_for_updates("LedControl")
+class LedControlNode():
+    """
+    The LED Control Node.
+    """
 
-    animation_map = {
-        Led_Control.COLOR_FLOW: AnimationType.ColorFlow,
-        Led_Control.FIRE: AnimationType.Fire,
-        Led_Control.LARSON: AnimationType.Larson,
-        Led_Control.RAINBOW: AnimationType.Rainbow,
-        Led_Control.RGB_FADE: AnimationType.RGBFade,
-        Led_Control.SINGLE_FADE: AnimationType.SingleFade,
-        Led_Control.TWINKLE: AnimationType.Twinkle,
-        Led_Control.TWINKLE_OFF: AnimationType.TwinkleOff,
-        Led_Control.STROBE: AnimationType.Strobe
-    }
+    def __init__(self) -> None:
 
-    rate = rospy.Rate(20)
+        self.animation_map = {
+            Led_Control.COLOR_FLOW: AnimationType.ColorFlow,
+            Led_Control.FIRE: AnimationType.Fire,
+            Led_Control.LARSON: AnimationType.Larson,
+            Led_Control.RAINBOW: AnimationType.Rainbow,
+            Led_Control.RGB_FADE: AnimationType.RGBFade,
+            Led_Control.SINGLE_FADE: AnimationType.SingleFade,
+            Led_Control.TWINKLE: AnimationType.Twinkle,
+            Led_Control.TWINKLE_OFF: AnimationType.TwinkleOff,
+            Led_Control.STROBE: AnimationType.Strobe
+        }
 
-    leds = LEDStrip(0, LEDStripType.RGBW)
+        self.control_subscriber = BufferedROSMsgHandlerPy(Led_Control)
+        self.control_subscriber.register_for_updates("LedControl")
 
-    while not rospy.is_shutdown():
+        self.leds = LEDStrip(0, LEDStripType.RGBW)
 
-        if control_subscriber.get() is not None:
-            control_msg: Led_Control = control_subscriber.get()
-            color = RGBWColor(control_msg.red, control_msg.green, control_msg.blue, control_msg.white)
+        loop_thread = Thread(target=self.loop)
+        loop_thread.start()
 
-            if control_msg.control_mode == Led_Control.SET_LED:
-                leds.setLEDControlMode(LEDControlMode.Static)
-                leds.setLEDColor(LEDColor(color, 0, control_msg.number_leds))
-            else:
-                animation = LEDAnimation(0, control_msg.brightness, control_msg.speed, control_msg.number_leds, color, animation_map[control_msg.animation])
+        rospy.spin()
 
-                leds.setLEDControlMode(LEDControlMode.Animated)
-                leds.setLEDAnimations([animation])
+        loop_thread.join(5)
 
-        rate.sleep()
+    def loop(self) -> None:
+        """
+        Periodic function for the LED Control Node.
+        """
+        rate = rospy.Rate(20)
 
+        while not rospy.is_shutdown():
 
-def ros_main(node_name):
-    rospy.init_node(node_name)
-    register_for_robot_updates()
+            if self.control_subscriber.get() is not None:
+                control_message: Led_Control = self.control_subscriber.get()
 
-    t1 = Thread(target=ros_func)
-    t1.start()
+                color = RGBWColor(control_message.red,
+                                  control_message.green,
+                                  control_message.blue,
+                                  control_message.white)
 
-    rospy.spin()
+                if control_message.control_mode == Led_Control.SET_LED:
+                    self.leds.setLEDControlMode(LEDControlMode.Static)
+                    self.leds.setLEDColor(LEDColor(color, 0, control_message.number_leds))
+                else:
+                    animation = LEDAnimation(0, control_message.brightness,
+                                             control_message.speed,
+                                             control_message.number_leds,
+                                             color,
+                                             self.animation_map[control_message.animation])
 
-    t1.join(5)
+                    self.leds.setLEDControlMode(LEDControlMode.Animated)
+                    self.leds.setLEDAnimations([animation])
+
+            rate.sleep()

@@ -1,9 +1,14 @@
-import rospy
+"""
+Class definition of the LED control node.
+"""
+
 from threading import Thread
 
-from frc_robot_utilities_py_node.BufferedROSMsgHandlerPy import BufferedROSMsgHandlerPy
+import rospy
+
 from ck_ros_msgs_node.msg import Led_Control
 from ck_utilities_py_node.led import AnimationType, LEDAnimation, LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor
+from frc_robot_utilities_py_node.BufferedROSMsgHandlerPy import BufferedROSMsgHandlerPy
 
 
 class LedControlNode():

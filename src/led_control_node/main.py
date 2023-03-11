@@ -33,7 +33,7 @@ class LedControlNode():
         self.control_subscriber = BufferedROSMsgHandlerPy(Led_Control)
         self.control_subscriber.register_for_updates("LedControl")
 
-        self.leds = LEDStrip(0, LEDStripType.RGBW)
+        self.leds = LEDStrip(0, LEDStripType.BRGW)
 
         loop_thread = Thread(target=self.loop)
         loop_thread.start()

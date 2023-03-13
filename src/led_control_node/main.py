@@ -7,7 +7,7 @@ from threading import Thread
 import rospy
 
 from ck_ros_msgs_node.msg import Led_Control
-from ck_utilities_py_node.led import AnimationType, LEDAnimation, LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor
+from ck_utilities_py_node.led import AnimationType, Direction, LEDAnimation, LEDColor, LEDControlMode, LEDStrip, LEDStripType, RGBWColor
 from frc_robot_utilities_py_node.BufferedROSMsgHandlerPy import BufferedROSMsgHandlerPy
 
 
@@ -62,11 +62,13 @@ class LedControlNode():
                     self.leds.setLEDControlMode(LEDControlMode.Static)
                     self.leds.setLEDColor(LEDColor(color, 0, control_message.number_leds))
                 else:
-                    animation = LEDAnimation(0, control_message.brightness,
+                    animation = LEDAnimation(0,
+                                             control_message.brightness,
                                              control_message.speed,
                                              control_message.number_leds,
                                              color,
-                                             self.animation_map[control_message.animation])
+                                             self.animation_map[control_message.animation],
+                                             Direction.Backward)
 
                     self.leds.setLEDControlMode(LEDControlMode.Animated)
                     self.leds.setLEDAnimations([animation])
